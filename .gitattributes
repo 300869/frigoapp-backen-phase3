@@ -1,17 +1,4 @@
-* text=auto
-.gitattributes text eol=lf
-
-# Forcer LF pour les fichiers texte/code
-*.py    text eol=lf
-*.md    text eol=lf
-*.yml   text eol=lf
-*.yaml  text eol=lf
-*.toml  text eol=lf
-*.json  text eol=lf
-*.sql   text eol=lf
-*.sh    text eol=lf
-
-# Garder CRLF pour scripts Windows
-*.bat   text eol=crlf
-*.cmd   text eol=crlf
-*.ps1   text eol=crlf
+﻿* text=auto
+*.py  text eol=lf
+*.yml text eol=lf
+*.ini text eol=lf
