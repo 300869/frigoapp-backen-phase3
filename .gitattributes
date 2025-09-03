@@ -1,15 +1,16 @@
-﻿# Par défaut: LF dans le repo
-* text=auto eol=lf
+* text=auto
 
-# Exceptions Windows
-*.ps1 text eol=crlf
-*.bat text eol=crlf
-*.cmd text eol=crlf
+# Forcer LF dans le repo pour les fichiers texte "code"
+*.py    text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.json  text eol=lf
+*.sql   text eol=lf
+*.sh    text eol=lf
 
-# Scripts Unix
-*.sh text eol=lf
-
-# Code (déjà LF via règle globale, mais on explicite)
-*.py text eol=lf
-*.sql text eol=lf
-*.md  text eol=lf
+# Garder CRLF pour les scripts Windows
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
