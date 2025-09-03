@@ -1,12 +1,14 @@
 import os
 import sys
 from logging.config import fileConfig
-from alembic import context
-from sqlalchemy import engine_from_config, pool
+
 from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
+
+from alembic import context
 
 # Ajouter la racine du projet au PYTHONPATH (?/migrations/.. -> racine)
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Charger .env
 load_dotenv()
@@ -32,6 +34,7 @@ from app.models import user  # assure l'import des tables
 
 target_metadata = Base.metadata
 
+
 def run_migrations_offline():
     """Run migrations in 'offline' mode."""
     url = config.get_main_option("sqlalchemy.url")
@@ -43,6 +46,7 @@ def run_migrations_offline():
     )
     with context.begin_transaction():
         context.run_migrations()
+
 
 def run_migrations_online():
     """Run migrations in 'online' mode."""
@@ -56,6 +60,7 @@ def run_migrations_online():
         context.configure(connection=connection, target_metadata=target_metadata)
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()

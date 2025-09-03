@@ -8,6 +8,7 @@ from app.models.user import User
 
 router = APIRouter()
 
+
 @router.get("/me")
 async def get_me(
     current=Depends(get_current_user),
@@ -16,7 +17,9 @@ async def get_me(
     # current contient {"id": 1, "email": "<mail du token>"}
     email = current.get("email")
     if not email:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )
 
     q = await session.execute(select(User).where(User.email == email))
     user = q.scalar_one_or_none()

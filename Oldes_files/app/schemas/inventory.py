@@ -1,6 +1,8 @@
-﻿from pydantic import BaseModel, Field
+﻿from datetime import date, datetime
 from typing import Optional
-from datetime import datetime, date
+
+from pydantic import BaseModel, Field
+
 
 class InventoryCreate(BaseModel):
     product_id: int
@@ -8,10 +10,12 @@ class InventoryCreate(BaseModel):
     expires_at: Optional[date] = None
     note: Optional[str] = None
 
+
 class InventoryUpdate(BaseModel):
     quantity: Optional[int] = Field(default=None, ge=0)
     expires_at: Optional[date] = None
     note: Optional[str] = None
+
 
 class InventoryRead(BaseModel):
     id: int
@@ -24,4 +28,3 @@ class InventoryRead(BaseModel):
 
     class Config:
         from_attributes = True
-

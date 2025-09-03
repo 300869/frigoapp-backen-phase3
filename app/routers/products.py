@@ -1,9 +1,11 @@
-﻿from fastapi import APIRouter, HTTPException, Depends
+﻿import logging
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.database import get_db
+
 from app import models, schemas
-from app.services.alerts_service import compute_kind, ensure_open_alert, close_alerts
-import logging
+from app.database import get_db
+from app.services.alerts_service import close_alerts, compute_kind, ensure_open_alert
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -40,7 +42,9 @@ def list_products(db: Session = Depends(get_db)):
 
 
 @router.put("/{product_id}", response_model=schemas.ProductRead)
-def update_product(product_id: int, payload: schemas.ProductUpdate, db: Session = Depends(get_db)):
+def update_product(
+    product_id: int, payload: schemas.ProductUpdate, db: Session = Depends(get_db)
+):
     obj = db.get(models.Product, product_id)
     if not obj:
         raise HTTPException(404, detail="Produit introuvable")

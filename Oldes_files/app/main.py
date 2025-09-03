@@ -2,11 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 
-from app.api import auth, users
+import app.api.inventory as inventory  # 👈 AJOUT
 import app.api.products as products  # import direct
-import app.api.inventory as inventory   # 👈 AJOUT
+from app.api import auth, users
 
-app = FastAPI(title="FrigoApp API", version="0.1.0", description="Backend FastAPI avec PostgreSQL")
+app = FastAPI(
+    title="FrigoApp API", version="0.1.0", description="Backend FastAPI avec PostgreSQL"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,7 +21,10 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
 app.include_router(products.router, prefix="/products", tags=["Products"])
-app.include_router(inventory.router, prefix="/inventory", tags=["Inventory"])  # 👈 AJOUT
+app.include_router(
+    inventory.router, prefix="/inventory", tags=["Inventory"]
+)  # 👈 AJOUT
+
 
 def custom_openapi():
     if app.openapi_schema:
@@ -39,5 +44,6 @@ def custom_openapi():
     openapi_schema["security"] = [{"bearerAuth": []}]
     app.openapi_schema = openapi_schema
     return app.openapi_schema
+
 
 app.openapi = custom_openapi

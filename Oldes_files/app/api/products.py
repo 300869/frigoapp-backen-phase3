@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import get_current_user
 from app.db.session import get_session
 from app.models.product import Product
-from app.schemas.product import ProductCreate, ProductUpdate, ProductRead
+from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
 
 router = APIRouter()
+
 
 @router.post("", response_model=ProductRead, status_code=201)
 async def create_product(
@@ -26,6 +27,7 @@ async def create_product(
     await session.refresh(obj)
     return obj
 
+
 @router.get("", response_model=list[ProductRead])
 async def list_products(
     page: int = Query(1, ge=1),
@@ -39,6 +41,7 @@ async def list_products(
     )
     return list(result.scalars().all())
 
+
 @router.get("/{product_id}", response_model=ProductRead)
 async def get_product(
     product_id: int,
@@ -50,6 +53,7 @@ async def get_product(
     if not obj:
         raise HTTPException(status_code=404, detail="Product not found")
     return obj
+
 
 @router.patch("/{product_id}", response_model=ProductRead)
 async def update_product(
@@ -70,6 +74,7 @@ async def update_product(
     await session.commit()
     await session.refresh(obj)
     return obj
+
 
 @router.delete("/{product_id}", status_code=204)
 async def delete_product(
