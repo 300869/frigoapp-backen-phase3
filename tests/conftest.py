@@ -36,3 +36,15 @@ from app.main import app  # doit exposer "app = FastAPI(...)"
 def client():
     with TestClient(app) as c:
         yield c
+
+
+import pytest
+
+
+@pytest.fixture
+def category_id(client):
+    # adapte l’URL/charge utile à ton API si besoin
+    r = client.post("/categories", json={"name": "Test"})
+    assert r.status_code in (200, 201)
+    data = r.json()
+    return data.get("id") or data.get("category", {}).get("id")
