@@ -31,3 +31,8 @@ app/
 ## Alembic (optionnel)
    alembic revision -m "init"
    alembic upgrade head
+## Roadmap
+
+- [ ] Auth
+- [x] Produits + Alertes
+
