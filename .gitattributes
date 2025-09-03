@@ -1,6 +1,7 @@
 * text=auto
+.gitattributes text eol=lf
 
-# Forcer LF dans le repo pour les fichiers texte "code"
+# Forcer LF pour les fichiers texte/code
 *.py    text eol=lf
 *.md    text eol=lf
 *.yml   text eol=lf
@@ -10,10 +11,7 @@
 *.sql   text eol=lf
 *.sh    text eol=lf
 
-# Garder CRLF pour les scripts Windows
+# Garder CRLF pour scripts Windows
 *.bat   text eol=crlf
 *.cmd   text eol=crlf
 *.ps1   text eol=crlf
-.gitattributes text eol=lf
-
-.gitattributes text eol=lf
