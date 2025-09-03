@@ -32,3 +32,5 @@ app/
    alembic revision -m "init"
    alembic upgrade head
 ![CI](https://github.com/300869/frigoapp-backen-phase3/actions/workflows/ci.yml/badge.svg)
+
+![CI](https://github.com/300869/frigoapp-backen-phase3/actions/workflows/ci.yml/badge.svg)
