@@ -1,4 +1,2 @@
-﻿* text=auto
-*.py  text eol=lf
-*.yml text eol=lf
-*.ini text eol=lf
+*.py text eol=lf
+
