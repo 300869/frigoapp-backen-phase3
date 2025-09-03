@@ -1,0 +1,1 @@
+Add migration scripts here with: alembic revision -m "init"
