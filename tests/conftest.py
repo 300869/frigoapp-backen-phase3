@@ -18,3 +18,21 @@ def setup_db():
     yield
     if Base and engine:
         Base.metadata.drop_all(bind=engine)
+
+
+import os
+
+import pytest
+from fastapi.testclient import TestClient
+
+# Forcer une base SQLite locale pour les tests CI/local
+os.environ.setdefault("DATABASE_URL", "sqlite:///./test_ci.db")
+
+# Import de l'app FastAPI
+from app.main import app  # doit exposer "app = FastAPI(...)"
+
+
+@pytest.fixture(scope="session")
+def client():
+    with TestClient(app) as c:
+        yield c
