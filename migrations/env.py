@@ -29,8 +29,8 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Importer metadata de SQLAlchemy (vos mod?les)
-from app.db.base import Base  # type: ignore
-from app.models import user  # assure l'import des tables
+from freshkeeper.db.base import Base  # type: ignore
+from freshkeeper.models import user  # assure l'import des tables
 
 target_metadata = Base.metadata
 

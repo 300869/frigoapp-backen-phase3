@@ -1,0 +1,3 @@
+# À insérer dans freshkeeper/main.py (ou votre fichier d'entrypoint FastAPI)
+from src.api.shopping import router as shopping_router
+app.include_router(shopping_router)

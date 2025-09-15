@@ -11,9 +11,9 @@ os.environ.setdefault("DATABASE_URL", "sqlite:///./test_ci.db")
 
 # Import de l'app FastAPI (package 'app' OU fichier 'main.py' à la racine)
 try:
-    from app.main import app  # app/main.py
+    from freshkeeper.main import freshkeeper  # app/main.py
 except ModuleNotFoundError:
-    from main import app  # main.py à la racine
+    from main import freshkeeper  # main.py à la racine
 
 
 # -----------------------------

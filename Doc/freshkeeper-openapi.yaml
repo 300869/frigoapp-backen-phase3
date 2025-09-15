@@ -1,0 +1,354 @@
+
+openapi: 3.0.3
+info:
+  title: FreshKeeper API
+  version: "0.3.0"
+  description: |
+    API de FreshKeeper (ex-FrigoApp) – Back-end FastAPI.
+    Cette version documente les endpoints de base (auth, users, products, categories, consumptions).
+    Les alertes arriveront en Phase 4 (scheduler + règles).
+servers:
+  - url: http://127.0.0.1:8000
+security:
+  - BearerAuth: []
+paths:
+  /auth/login:
+    post:
+      summary: Connexion et obtention d'un token
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: {type: string, format: email}
+                password: {type: string, format: password}
+              required: [email, password]
+      responses:
+        "200":
+          description: Jeton JWT
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token: {type: string}
+                  token_type: {type: string, example: bearer}
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /users/me:
+    get:
+      summary: Profil de l'utilisateur courant
+      tags: [users]
+      responses:
+        "200":
+          description: Utilisateur courant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /products:
+    get:
+      summary: Lister les produits
+      tags: [products]
+      parameters:
+        - in: query
+          name: q
+          schema: {type: string}
+          description: Filtre texte
+      responses:
+        "200":
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: "#/components/schemas/Product"}
+    post:
+      summary: Créer un produit
+      tags: [products]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProductCreate"}
+      responses:
+        "201":
+          description: Produit créé
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Product"}
+
+  /products/{product_id}:
+    get:
+      summary: Récupérer un produit
+      tags: [products]
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema: {type: integer}
+      responses:
+        "200":
+          description: Produit
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Product"}
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Mettre à jour un produit
+      tags: [products]
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema: {type: integer}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ProductUpdate"}
+      responses:
+        "200":
+          description: Produit mis à jour
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Product"}
+    delete:
+      summary: Supprimer un produit
+      tags: [products]
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema: {type: integer}
+      responses:
+        "204":
+          description: Supprimé
+
+  /categories:
+    get:
+      summary: Lister les catégories
+      tags: [categories]
+      responses:
+        "200":
+          description: Liste
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: "#/components/schemas/Category"}
+    post:
+      summary: Créer une catégorie
+      tags: [categories]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/CategoryCreate"}
+      responses:
+        "201":
+          description: Catégorie créée
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Category"}
+
+  /categories/{category_id}:
+    get:
+      summary: Récupérer une catégorie
+      tags: [categories]
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema: {type: integer}
+      responses:
+        "200":
+          description: Catégorie
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Category"}
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Mettre à jour une catégorie
+      tags: [categories]
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema: {type: integer}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/CategoryUpdate"}
+      responses:
+        "200":
+          description: Catégorie mise à jour
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Category"}
+    delete:
+      summary: Supprimer une catégorie
+      tags: [categories]
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema: {type: integer}
+      responses:
+        "204":
+          description: Supprimé
+
+  /consumptions:
+    get:
+      summary: Lister les consommations
+      tags: [consumptions]
+      responses:
+        "200":
+          description: Liste
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: "#/components/schemas/Consumption"}
+    post:
+      summary: Créer une consommation
+      tags: [consumptions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/ConsumptionCreate"}
+      responses:
+        "201":
+          description: Consommation créée
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Consumption"}
+
+  /consumptions/{consumption_id}:
+    delete:
+      summary: Supprimer une consommation
+      tags: [consumptions]
+      parameters:
+        - in: path
+          name: consumption_id
+          required: true
+          schema: {type: integer}
+      responses:
+        "204":
+          description: Supprimé
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Non authentifié ou token invalide
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+    NotFound:
+      description: Ressource non trouvée
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id: {type: integer}
+        email: {type: string, format: email}
+        full_name: {type: string}
+        created_at: {type: string, format: date-time}
+
+    Category:
+      type: object
+      properties:
+        id: {type: integer}
+        name: {type: string}
+
+    CategoryCreate:
+      type: object
+      properties:
+        name: {type: string}
+      required: [name]
+
+    CategoryUpdate:
+      type: object
+      properties:
+        name: {type: string}
+
+    Product:
+      type: object
+      properties:
+        id: {type: integer}
+        name: {type: string}
+        category_id: {type: integer}
+        default_shelf_life_days: {type: integer}
+        location: {type: string, enum: [fridge, freezer, pantry]}
+        quantity: {type: number}
+        purchase_date: {type: string, format: date}
+        expiry_date: {type: string, format: date}
+      required: [id, name, category_id]
+
+    ProductCreate:
+      type: object
+      properties:
+        name: {type: string}
+        category_id: {type: integer}
+        default_shelf_life_days: {type: integer}
+        location: {type: string, enum: [fridge, freezer, pantry]}
+        quantity: {type: number}
+        purchase_date: {type: string, format: date}
+      required: [name, category_id]
+
+    ProductUpdate:
+      type: object
+      properties:
+        name: {type: string}
+        category_id: {type: integer}
+        default_shelf_life_days: {type: integer}
+        location: {type: string, enum: [fridge, freezer, pantry]}
+        quantity: {type: number}
+        purchase_date: {type: string, format: date}
+        expiry_date: {type: string, format: date}
+
+    Consumption:
+      type: object
+      properties:
+        id: {type: integer}
+        product_id: {type: integer}
+        quantity: {type: number}
+        consumed_at: {type: string, format: date-time}
+      required: [id, product_id, quantity]
+
+    ConsumptionCreate:
+      type: object
+      properties:
+        product_id: {type: integer}
+        quantity: {type: number}
+      required: [product_id, quantity]
+
+    Error:
+      type: object
+      properties:
+        detail:
+          oneOf:
+            - type: string
+            - type: array
+              items: {type: string}

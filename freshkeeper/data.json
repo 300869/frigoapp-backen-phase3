@@ -1,0 +1,157 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Mangues",
+      "expiry_date": null
+    },
+    {
+      "id": 3,
+      "name": "Banane",
+      "expiry_date": null
+    },
+    {
+      "id": 4,
+      "name": "Raisins",
+      "expiry_date": null
+    }
+  ],
+  "next_id": 5,
+  "product_index": {
+    "mangue": 1,
+    "banane": 3,
+    "raisin": 4
+  },
+  "lots": [
+    {
+      "id": 1,
+      "product_id": 3,
+      "product_name": "Banane",
+      "quantity": 6.0,
+      "unit": "pcs",
+      "purchased_at": "2025-09-07",
+      "expiry_date": "2025-09-11",
+      "consumed": 0.0,
+      "location": "pantry"
+    },
+    {
+      "id": 3,
+      "product_id": 3,
+      "product_name": "Banane",
+      "quantity": 1.0,
+      "unit": "Banane ",
+      "purchased_at": "2025-09-07",
+      "expiry_date": "2025-09-11",
+      "consumed": 0.0,
+      "location": "pantry"
+    },
+    {
+      "id": 4,
+      "product_id": 1,
+      "product_name": "Mangues",
+      "quantity": 5.0,
+      "unit": "Mangue ",
+      "purchased_at": "2025-09-05",
+      "expiry_date": "2025-09-11",
+      "consumed": 0.0,
+      "location": "pantry"
+    },
+    {
+      "id": 6,
+      "product_id": 1,
+      "product_name": "Mangues",
+      "quantity": 10.0,
+      "unit": "Mangues",
+      "purchased_at": "2025-09-01",
+      "expiry_date": "2025-09-09",
+      "consumed": 0.0,
+      "location": "pantry"
+    },
+    {
+      "id": 7,
+      "product_id": 1,
+      "product_name": "Mangues",
+      "quantity": 1.0,
+      "unit": "pcs",
+      "purchased_at": "2025-09-09",
+      "expiry_date": "2025-09-13",
+      "consumed": 0.0,
+      "location": "pantry"
+    },
+    {
+      "id": 8,
+      "product_id": 3,
+      "product_name": "Banane",
+      "quantity": 6.0,
+      "unit": "pcs",
+      "purchased_at": "2025-09-01",
+      "expiry_date": "2025-09-05",
+      "consumed": 0.0,
+      "location": "pantry"
+    },
+    {
+      "id": 9,
+      "product_id": 3,
+      "product_name": "Banane",
+      "quantity": 8.0,
+      "unit": "pcs",
+      "purchased_at": "2025-09-09",
+      "expiry_date": "2025-09-11",
+      "consumed": 0.0,
+      "location": "pantry"
+    },
+    {
+      "id": 10,
+      "product_id": 1,
+      "product_name": "Mangues",
+      "quantity": 25.0,
+      "unit": "Mangue ",
+      "purchased_at": "2025-08-02",
+      "expiry_date": "2025-08-17",
+      "consumed": 0.0,
+      "location": "pantry"
+    }
+  ],
+  "next_lot_id": 11,
+  "dismissed_alert_ids": [
+    200001,
+    200003,
+    200004,
+    200006,
+    100008,
+    200009
+  ],
+  "shopping_list": [
+    {
+      "id": 1,
+      "name": "Patates douces",
+      "product_id": null,
+      "quantity": 4.0,
+      "unit": "2",
+      "status": "bought",
+      "created_at": "2025-09-09T18:11:27Z",
+      "from_suggestion": false
+    },
+    {
+      "id": 2,
+      "name": "Bouteille d'huile d'olive",
+      "product_id": null,
+      "quantity": 2.0,
+      "unit": "12",
+      "status": "bought",
+      "created_at": "2025-09-09T18:12:05Z",
+      "from_suggestion": false
+    },
+    {
+      "id": 3,
+      "name": "Pains",
+      "product_id": null,
+      "quantity": 4.0,
+      "unit": "2",
+      "status": "bought",
+      "created_at": "2025-09-09T18:18:02Z",
+      "from_suggestion": false
+    }
+  ],
+  "next_shop_id": 4
+}

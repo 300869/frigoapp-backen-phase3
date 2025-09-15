@@ -1,0 +1,52 @@
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
+from app.schemas.alerts import AlertCreate, AlertKind
+from app.models.alert import Alert
+
+def _as_str_kind(v) -> str:
+    # Tolère à la fois un Enum et une str
+    try:
+        return v.value  # Enum -> "SOON"
+    except AttributeError:
+        return str(v)
+
+def list_alerts(db: Session, *, kind: AlertKind | str | None = None, ack: bool | None = None):
+    stmt = select(Alert)
+    if kind is not None:
+        stmt = stmt.where(Alert.kind == _as_str_kind(kind))
+    if ack is not None:
+        stmt = stmt.where(Alert.is_ack == ack)
+        stmt = stmt.where(Alert.message.isnot(None), Alert.message != "")
+    	return list(db.execute(stmt).scalars().all())
+
+def create_alert(db: Session, payload: AlertCreate) -> Alert:
+    alert = Alert(
+        product_id=payload.product_id,
+        kind=_as_str_kind(payload.kind),
+        message=payload.message,
+        due_date=payload.due_date,
+        is_ack=False,
+    )
+    db.add(alert)
+    try:
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+        raise
+    db.refresh(alert)
+    return alert
+
+def ack_alert(db: Session, alert_id: int) -> Alert:
+    alert = db.get(Alert, alert_id)
+    if not alert:
+        raise ValueError("Alert not found")
+    alert.is_ack = True
+    db.add(alert)
+    try:
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+        raise
+    db.refresh(alert)
+    return alert

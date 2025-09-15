@@ -1,0 +1,25 @@
+{
+  "auth": {
+    "login": "Se connecter",
+    "email": "Email",
+    "password": "Mot de passe",
+    "logout": "Se déconnecter"
+  },
+  "nav": {
+    "home": "Accueil",
+    "products": "Produits",
+    "alerts": "Alertes",
+    "shopping": "Courses",
+    "settings": "Réglages"
+  },
+  "home": {
+    "title": "Tableau de bord",
+    "soon": "Bientôt périmés",
+    "expired": "Périmés",
+    "out": "Stock épuisé"
+  },
+  "actions": {
+    "retry": "Réessayer",
+    "save": "Enregistrer"
+  }
+}

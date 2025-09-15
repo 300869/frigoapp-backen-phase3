@@ -1,39 +1,71 @@
-"""create inventory table
+"""create alerts table (with indexes + unique constraint)
 
-Revision ID: 20250902170000
+Revision ID: 20250902163000
 Revises: 20250902160000
-Create Date: 2025-09-02 17:00:00
+Create Date: 2025-09-02 16:30:00
 """
 
 import sqlalchemy as sa
 
 from alembic import op
 
-# Identifiants
-revision = "20250902170000"
-down_revision = "20250902160000"  # ← mets l'ID exact de ta migration "products"
+# IDs
+revision = "20250902163000"
+down_revision = "20250902160000"
 branch_labels = None
 depends_on = None
 
 
 def upgrade() -> None:
     op.create_table(
-        "inventory",
+        "alerts",
         sa.Column("id", sa.Integer(), primary_key=True),
-        sa.Column("user_id", sa.Integer(), nullable=False, index=True),
-        sa.Column("product_id", sa.Integer(), nullable=False, index=True),
-        sa.Column("quantity", sa.Integer(), nullable=False),
-        sa.Column("added_at", sa.DateTime(), nullable=False),
-        sa.Column("expires_at", sa.Date(), nullable=True),
-        sa.Column("note", sa.String(length=255), nullable=True),
+        sa.Column(
+            "product_id",
+            sa.Integer(),
+            sa.ForeignKey("products.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "kind", sa.String(length=32), nullable=False
+        ),  # SOON, EXPIRED, OUT_OF_STOCK...
+        sa.Column(
+            "due_date", sa.Date(), nullable=True
+        ),  # peut être NULL (ex: OUT_OF_STOCK legacy)
+        sa.Column(
+            "is_ack", sa.Boolean(), server_default=sa.text("false"), nullable=False
+        ),
+        sa.Column("message", sa.Text(), nullable=True),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.UniqueConstraint(
+            "product_id",
+            "kind",
+            "due_date",
+            name="uq_alerts_product_kind_date",
+        ),
     )
-    op.create_index("ix_inventory_id", "inventory", ["id"])
-    op.create_index("ix_inventory_user", "inventory", ["user_id"])
-    op.create_index("ix_inventory_product", "inventory", ["product_id"])
+
+    # Index pour les filtres/tri utilisés par les routes
+    op.create_index("ix_alerts_due_date", "alerts", ["due_date"])
+    op.create_index("ix_alerts_kind_due_date", "alerts", ["kind", "due_date"])
+    op.create_index("ix_alerts_product_kind", "alerts", ["product_id", "kind"])
+    op.create_index("ix_alerts_is_ack", "alerts", ["is_ack"])
 
 
 def downgrade() -> None:
-    op.drop_index("ix_inventory_product", table_name="inventory")
-    op.drop_index("ix_inventory_user", table_name="inventory")
-    op.drop_index("ix_inventory_id", table_name="inventory")
-    op.drop_table("inventory")
+    op.drop_index("ix_alerts_is_ack", table_name="alerts")
+    op.drop_index("ix_alerts_product_kind", table_name="alerts")
+    op.drop_index("ix_alerts_kind_due_date", table_name="alerts")
+    op.drop_index("ix_alerts_due_date", table_name="alerts")
+    op.drop_table("alerts")

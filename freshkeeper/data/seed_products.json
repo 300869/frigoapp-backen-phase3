@@ -1,0 +1,417 @@
+{
+  "categories": [
+    {
+      "name": "fruit",
+      "shelf_life": {
+        "pantry": 5,
+        "fridge": 7,
+        "freezer": 90
+      }
+    },
+    {
+      "name": "legume",
+      "shelf_life": {
+        "pantry": 5,
+        "fridge": 7,
+        "freezer": 90
+      }
+    },
+    {
+      "name": "viande",
+      "shelf_life": {
+        "fridge": 3,
+        "freezer": 180
+      }
+    },
+    {
+      "name": "boisson",
+      "shelf_life": {
+        "pantry": 30
+      }
+    },
+    {
+      "name": "conserve",
+      "shelf_life": {
+        "pantry": 365
+      }
+    },
+    {
+      "name": "laitage",
+      "shelf_life": {
+        "fridge": 7
+      }
+    },
+    {
+      "name": "boulangerie",
+      "shelf_life": {
+        "pantry": 2,
+        "fridge": 5
+      }
+    }
+  ],
+  "products": [
+    {
+      "name": "banane",
+      "aliases": [
+        "bananes"
+      ],
+      "category": "fruit",
+      "shelf_life": {
+        "pantry": 5,
+        "fridge": 7
+      }
+    },
+    {
+      "name": "orange",
+      "aliases": [
+        "oranges"
+      ],
+      "category": "fruit",
+      "shelf_life": {
+        "pantry": 14,
+        "fridge": 21
+      }
+    },
+    {
+      "name": "mangue",
+      "aliases": [
+        "mangues"
+      ],
+      "category": "fruit",
+      "shelf_life": {
+        "pantry": 5,
+        "fridge": 7
+      }
+    },
+    {
+      "name": "papaye",
+      "aliases": [
+        "papayes"
+      ],
+      "category": "fruit",
+      "shelf_life": {
+        "pantry": 4,
+        "fridge": 6
+      }
+    },
+    {
+      "name": "pomme",
+      "aliases": [
+        "pommes"
+      ],
+      "category": "fruit",
+      "shelf_life": {
+        "pantry": 21,
+        "fridge": 30
+      }
+    },
+    {
+      "name": "poire",
+      "aliases": [
+        "poires"
+      ],
+      "category": "fruit",
+      "shelf_life": {
+        "pantry": 10,
+        "fridge": 14
+      }
+    },
+    {
+      "name": "fraise",
+      "aliases": [
+        "fraises"
+      ],
+      "category": "fruit",
+      "shelf_life": {
+        "fridge": 3
+      }
+    },
+    {
+      "name": "tomate",
+      "aliases": [
+        "tomates"
+      ],
+      "category": "legume",
+      "shelf_life": {
+        "fridge": 5
+      }
+    },
+    {
+      "name": "carotte",
+      "aliases": [
+        "carottes"
+      ],
+      "category": "legume",
+      "shelf_life": {
+        "fridge": 14
+      }
+    },
+    {
+      "name": "oignon",
+      "aliases": [
+        "oignons",
+        "ognon",
+        "ognons"
+      ],
+      "category": "legume",
+      "shelf_life": {
+        "pantry": 21
+      }
+    },
+    {
+      "name": "ail",
+      "aliases": [
+        "gousse d ail",
+        "gousses",
+        "tete d ail",
+        "tetes d ail"
+      ],
+      "category": "legume",
+      "shelf_life": {
+        "pantry": 30
+      }
+    },
+    {
+      "name": "pomme de terre",
+      "aliases": [
+        "pommes de terre"
+      ],
+      "category": "legume",
+      "shelf_life": {
+        "pantry": 30
+      }
+    },
+    {
+      "name": "courgette",
+      "aliases": [
+        "courgettes"
+      ],
+      "category": "legume",
+      "shelf_life": {
+        "fridge": 5
+      }
+    },
+    {
+      "name": "poivron",
+      "aliases": [
+        "poivrons"
+      ],
+      "category": "legume",
+      "shelf_life": {
+        "fridge": 5
+      }
+    },
+    {
+      "name": "lait",
+      "aliases": [
+        "laits"
+      ],
+      "category": "laitage",
+      "shelf_life": {
+        "fridge": 7
+      }
+    },
+    {
+      "name": "yaourt",
+      "aliases": [
+        "yaourts"
+      ],
+      "category": "laitage",
+      "shelf_life": {
+        "fridge": 7
+      }
+    },
+    {
+      "name": "fromage",
+      "aliases": [
+        "fromages"
+      ],
+      "category": "laitage",
+      "shelf_life": {
+        "fridge": 10
+      }
+    },
+    {
+      "name": "beurre",
+      "aliases": [
+        "beurres"
+      ],
+      "category": "laitage",
+      "shelf_life": {
+        "fridge": 30
+      }
+    },
+    {
+      "name": "creme",
+      "aliases": [
+        "creme fraiche",
+        "cremes"
+      ],
+      "category": "laitage",
+      "shelf_life": {
+        "fridge": 7
+      }
+    },
+    {
+      "name": "poulet",
+      "aliases": [
+        "poulets"
+      ],
+      "category": "viande",
+      "shelf_life": {
+        "fridge": 2,
+        "freezer": 180
+      }
+    },
+    {
+      "name": "boeuf",
+      "aliases": [
+        "boeufs",
+        "steak",
+        "steaks"
+      ],
+      "category": "viande",
+      "shelf_life": {
+        "fridge": 3,
+        "freezer": 180
+      }
+    },
+    {
+      "name": "porc",
+      "aliases": [
+        "porcs"
+      ],
+      "category": "viande",
+      "shelf_life": {
+        "fridge": 3,
+        "freezer": 180
+      }
+    },
+    {
+      "name": "dinde",
+      "aliases": [
+        "dindes"
+      ],
+      "category": "viande",
+      "shelf_life": {
+        "fridge": 2,
+        "freezer": 180
+      }
+    },
+    {
+      "name": "thon",
+      "aliases": [
+        "thon en boite"
+      ],
+      "category": "conserve",
+      "shelf_life": {
+        "pantry": 365
+      }
+    },
+    {
+      "name": "maïs",
+      "aliases": [
+        "mais",
+        "mais en boite"
+      ],
+      "category": "conserve",
+      "shelf_life": {
+        "pantry": 365
+      }
+    },
+    {
+      "name": "haricot",
+      "aliases": [
+        "haricots",
+        "haricots rouges"
+      ],
+      "category": "conserve",
+      "shelf_life": {
+        "pantry": 365
+      }
+    },
+    {
+      "name": "sauce tomate",
+      "aliases": [
+        "coulis tomate",
+        "tomate en boite"
+      ],
+      "category": "conserve",
+      "shelf_life": {
+        "pantry": 365
+      }
+    },
+    {
+      "name": "olives",
+      "aliases": [
+        "olive"
+      ],
+      "category": "conserve",
+      "shelf_life": {
+        "pantry": 365
+      }
+    },
+    {
+      "name": "pain",
+      "aliases": [
+        "baguette",
+        "pains"
+      ],
+      "category": "boulangerie",
+      "shelf_life": {
+        "pantry": 2,
+        "fridge": 5
+      }
+    },
+    {
+      "name": "brioche",
+      "aliases": [
+        "brioches"
+      ],
+      "category": "boulangerie",
+      "shelf_life": {
+        "pantry": 3
+      }
+    },
+    {
+      "name": "croissant",
+      "aliases": [
+        "croissants"
+      ],
+      "category": "boulangerie",
+      "shelf_life": {
+        "pantry": 2
+      }
+    },
+    {
+      "name": "eau",
+      "aliases": [
+        "bouteille d eau"
+      ],
+      "category": "boisson",
+      "shelf_life": {
+        "pantry": 365
+      }
+    },
+    {
+      "name": "jus d orange",
+      "aliases": [
+        "jus"
+      ],
+      "category": "boisson",
+      "shelf_life": {
+        "pantry": 10
+      }
+    },
+    {
+      "name": "soda",
+      "aliases": [
+        "colas"
+      ],
+      "category": "boisson",
+      "shelf_life": {
+        "pantry": 120
+      }
+    }
+  ]
+}

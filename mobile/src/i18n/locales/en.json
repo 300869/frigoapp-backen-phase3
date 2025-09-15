@@ -1,0 +1,25 @@
+{
+  "auth": {
+    "login": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "logout": "Log out"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "alerts": "Alerts",
+    "shopping": "Shopping",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Dashboard",
+    "soon": "Expiring soon",
+    "expired": "Expired",
+    "out": "Out of stock"
+  },
+  "actions": {
+    "retry": "Retry",
+    "save": "Save"
+  }
+}

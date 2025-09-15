@@ -1,0 +1,25 @@
+{
+  "auth": {
+    "login": "Iniciar sesión",
+    "email": "Correo",
+    "password": "Contraseña",
+    "logout": "Cerrar sesión"
+  },
+  "nav": {
+    "home": "Inicio",
+    "products": "Productos",
+    "alerts": "Alertas",
+    "shopping": "Compras",
+    "settings": "Ajustes"
+  },
+  "home": {
+    "title": "Panel",
+    "soon": "Próximos a caducar",
+    "expired": "Caducados",
+    "out": "Sin stock"
+  },
+  "actions": {
+    "retry": "Reintentar",
+    "save": "Guardar"
+  }
+}
