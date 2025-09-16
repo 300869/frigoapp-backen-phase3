@@ -905,7 +905,7 @@ async def _create_product(request: Request):
 
 # -------- Lots: GET existe déjà chez toi; on ajoute POST attendu par l'app --------
 # -------- Lots: POST (JSON ou FORM) -----------------------------------------------
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError, ProgrammingError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError, ProgrammingError
 from fastapi.encoders import jsonable_encoder
 from decimal import Decimal
 
@@ -942,55 +942,75 @@ async def _create_lot(request: Request):
 
     eng = _eng()
     with eng.begin() as c:
-        params = {
-            "product_id": product_id,
-            "quantity": quantity,
-            "unit": unit,
-            "expiry_date": expiry_date,
-            "storage_location_id": storage_location_id,
-            "unit_norm": unit_norm,
-        }
-
-        # 1) UPDATE si existe
-        upd_id = c.execute(text("""
-            UPDATE lots
-               SET quantity = quantity + :quantity,
-                   updated_at = NOW()
-             WHERE product_id = :product_id
-               AND storage_location_id = :storage_location_id
-               AND ((expiry_date IS NULL AND :expiry_date IS NULL) OR expiry_date = :expiry_date)
-               AND COALESCE(unit_norm,'') = COALESCE(:unit_norm,'')
-            RETURNING id
-        """), params).scalar_one_or_none()
-
-        if upd_id is None:
-            # 2) Sinon INSERT
-            try:
-                new_id = c.execute(text("""
+        try:
+            # 1) UPSERT par colonnes (plus portable que par nom de contrainte)
+            new_id = c.execute(
+                text("""
                     INSERT INTO lots (product_id, quantity, unit, expiry_date, storage_location_id, unit_norm)
                     VALUES (:product_id, :quantity, :unit, :expiry_date, :storage_location_id, :unit_norm)
+                    ON CONFLICT (product_id, expiry_date, storage_location_id, unit_norm)
+                    DO UPDATE SET quantity = lots.quantity + EXCLUDED.quantity,
+                                  updated_at = NOW()
                     RETURNING id
-                """), params).scalar_one()
-            except (IntegrityError, ProgrammingError, SQLAlchemyError):
-                # 3) Collision/contrainte absente → re-UPDATE
-                new_id = c.execute(text("""
+                """),
+                {
+                    "product_id": product_id,
+                    "quantity": quantity,
+                    "unit": unit,
+                    "expiry_date": expiry_date,
+                    "storage_location_id": storage_location_id,
+                    "unit_norm": unit_norm,
+                }
+            ).scalar_one()
+        except (ProgrammingError, IntegrityError, SQLAlchemyError):
+            # 2) Fallback universel : UPDATE si ligne existe, sinon INSERT simple
+            upd = c.execute(
+                text("""
                     UPDATE lots
                        SET quantity = quantity + :quantity,
                            updated_at = NOW()
                      WHERE product_id = :product_id
                        AND storage_location_id = :storage_location_id
-                       AND ((expiry_date IS NULL AND :expiry_date IS NULL) OR expiry_date = :expiry_date)
+                       AND ((expiry_date IS NULL AND :expiry_date IS NULL) OR (expiry_date = :expiry_date))
                        AND COALESCE(unit_norm,'') = COALESCE(:unit_norm,'')
                     RETURNING id
-                """), params).scalar_one()
-        else:
-            new_id = upd_id
+                """),
+                {
+                    "product_id": product_id,
+                    "quantity": quantity,
+                    "expiry_date": expiry_date,
+                    "storage_location_id": storage_location_id,
+                    "unit_norm": unit_norm,
+                }
+            ).scalar_one_or_none()
 
-        row = c.execute(text("""
-            SELECT id, product_id,
-                   CAST(quantity AS double precision) AS quantity,
-                   unit, expiry_date, storage_location_id
-            FROM lots WHERE id=:id
-        """), {"id": new_id}).mappings().one()
+            if upd is None:
+                new_id = c.execute(
+                    text("""
+                        INSERT INTO lots (product_id, quantity, unit, expiry_date, storage_location_id, unit_norm)
+                        VALUES (:product_id, :quantity, :unit, :expiry_date, :storage_location_id, :unit_norm)
+                        RETURNING id
+                    """),
+                    {
+                        "product_id": product_id,
+                        "quantity": quantity,
+                        "unit": unit,
+                        "expiry_date": expiry_date,
+                        "storage_location_id": storage_location_id,
+                        "unit_norm": unit_norm,
+                    }
+                ).scalar_one()
+            else:
+                new_id = upd
+
+        row = c.execute(
+            text("""
+                SELECT id, product_id,
+                       CAST(quantity AS double precision) AS quantity,
+                       unit, expiry_date, storage_location_id
+                FROM lots WHERE id=:id
+            """),
+            {"id": new_id}
+        ).mappings().one()
 
     return JSONResponse(jsonable_encoder(dict(row), custom_encoder={Decimal: float}), status_code=201)

@@ -1,10 +1,6 @@
 ﻿import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.exc import IntegrityError
-from fastapi.encoders import jsonable_encoder
-from decimal import Decimal
-
 
 # 1) Charger .env TÔT pour que DATABASE_URL soit dispo à l'import des routeurs
 try:
@@ -901,13 +897,22 @@ async def _create_product(request: Request):
             SELECT id, name, category, unit, quantity, expiry_date
             FROM products WHERE id=:id
         """), {"id": new_id}).mappings().one()
-    
+    from decimal import Decimal
+_row = dict(row)
+try:
+    if isinstance(_row.get("quantity"), Decimal):
+        _row["quantity"] = float(_row["quantity"])
+except Exception:
+    pass
+return JSONResponse(_row, status_code=201)
 
 # -------- Lots: GET existe déjà chez toi; on ajoute POST attendu par l'app --------
 # -------- Lots: POST (JSON ou FORM) -----------------------------------------------
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError, ProgrammingError
+from fastapi import Request
+from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from decimal import Decimal
+from sqlalchemy import text
 
 @app.post("/lots")
 @app.post("/lots/")
@@ -918,79 +923,98 @@ from decimal import Decimal
 async def _create_lot(request: Request):
     p = await _payload(request)
 
+    # champs attendus: product_id, quantity, storage_location_id (+ unit, expiry_date optionnels)
     def _int(v):
-        try: return int(v)
-        except: return None
+        try:
+            return int(v)
+        except Exception:
+            return None
 
     def _float(v):
-        try: return float(v)
-        except: return None
+        try:
+            return float(v)
+        except Exception:
+            return None
 
     product_id = _int(p.get("product_id"))
     storage_location_id = _int(p.get("storage_location_id"))
     quantity = _float(p.get("quantity"))
     unit = p.get("unit") or None
-    expiry_date = p.get("expiry_date") or None  # "YYYY-MM-DD" ou None
-    unit_norm = (unit or "").strip().lower()
+    expiry_date = p.get("expiry_date") or None  # YYYY-MM-DD ou None
 
     missing = []
-    if not product_id: missing.append("product_id")
-    if quantity is None: missing.append("quantity")
-    if not storage_location_id: missing.append("storage_location_id")
+    if not product_id:
+        missing.append("product_id")
+    if quantity is None:
+        missing.append("quantity")
+    if not storage_location_id:
+        missing.append("storage_location_id")
     if missing:
-        return JSONResponse({"detail":"Invalid payload","errors":[{"loc":missing,"msg":"Field(s) required"}]}, status_code=400)
+        return JSONResponse(
+            {"detail": "Invalid payload", "errors": [{"loc": missing, "msg": "Field(s) required"}]},
+            status_code=400,
+        )
 
     eng = _eng()
     with eng.begin() as c:
-        params = {
-            "product_id": product_id,
-            "quantity": quantity,
-            "unit": unit,
-            "expiry_date": expiry_date,
-            "storage_location_id": storage_location_id,
-            "unit_norm": unit_norm,
-        }
+        new_id = c.execute(
+            text("""
+                INSERT INTO lots (product_id, quantity, unit, expiry_date, storage_location_id)
+                VALUES (:product_id, :quantity, :unit, :expiry_date, :storage_location_id)
+                RETURNING id
+            """),
+            {
+                "product_id": product_id,
+                "quantity": quantity,
+                "unit": unit,
+                "expiry_date": expiry_date,
+                "storage_location_id": storage_location_id,
+            },
+        ).scalar_one()
 
-        # 1) UPDATE si existe
-        upd_id = c.execute(text("""
-            UPDATE lots
-               SET quantity = quantity + :quantity,
-                   updated_at = NOW()
-             WHERE product_id = :product_id
-               AND storage_location_id = :storage_location_id
-               AND ((expiry_date IS NULL AND :expiry_date IS NULL) OR expiry_date = :expiry_date)
-               AND COALESCE(unit_norm,'') = COALESCE(:unit_norm,'')
-            RETURNING id
-        """), params).scalar_one_or_none()
+        row = c.execute(
+            text("""
+                SELECT id, product_id, quantity, unit, expiry_date, storage_location_id
+                FROM lots WHERE id=:id
+            """),
+            {"id": new_id},
+        ).mappings().one()
 
-        if upd_id is None:
-            # 2) Sinon INSERT
-            try:
-                new_id = c.execute(text("""
-                    INSERT INTO lots (product_id, quantity, unit, expiry_date, storage_location_id, unit_norm)
-                    VALUES (:product_id, :quantity, :unit, :expiry_date, :storage_location_id, :unit_norm)
-                    RETURNING id
-                """), params).scalar_one()
-            except (IntegrityError, ProgrammingError, SQLAlchemyError):
-                # 3) Collision/contrainte absente → re-UPDATE
-                new_id = c.execute(text("""
-                    UPDATE lots
-                       SET quantity = quantity + :quantity,
-                           updated_at = NOW()
-                     WHERE product_id = :product_id
-                       AND storage_location_id = :storage_location_id
-                       AND ((expiry_date IS NULL AND :expiry_date IS NULL) OR expiry_date = :expiry_date)
-                       AND COALESCE(unit_norm,'') = COALESCE(:unit_norm,'')
-                    RETURNING id
-                """), params).scalar_one()
-        else:
-            new_id = upd_id
+    # Decimal -> float OK pour JSON
+    data = jsonable_encoder(dict(row), custom_encoder={Decimal: float})
+    return JSONResponse(data, status_code=201)
 
-        row = c.execute(text("""
-            SELECT id, product_id,
-                   CAST(quantity AS double precision) AS quantity,
-                   unit, expiry_date, storage_location_id
-            FROM lots WHERE id=:id
-        """), {"id": new_id}).mappings().one()
 
-    return JSONResponse(jsonable_encoder(dict(row), custom_encoder={Decimal: float}), status_code=201)
+    eng = _eng()
+    with eng.begin() as c:
+        new_id = c.execute(
+            text(
+                """
+                INSERT INTO lots (product_id, quantity, unit, expiry_date, storage_location_id)
+                VALUES (:product_id, :quantity, :unit, :expiry_date, :storage_location_id)
+                RETURNING id
+                """
+            ),
+            {
+                "product_id": product_id,
+                "quantity": quantity,
+                "unit": unit,
+                "expiry_date": expiry_date,
+                "storage_location_id": storage_location_id,
+            },
+        ).scalar_one()
+
+        # On relit le lot inséré
+        row = c.execute(
+            text(
+                """
+                SELECT id, product_id, quantity, unit, expiry_date, storage_location_id
+                FROM lots WHERE id=:id
+                """
+            ),
+            {"id": new_id},
+        ).mappings().one()
+
+    # IMPORTANT : Decimal -> float pour JSON
+    data = jsonable_encoder(dict(row), custom_encoder={Decimal: float})
+    return JSONResponse(data, status_code=201)

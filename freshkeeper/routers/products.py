@@ -1,68 +1,70 @@
-﻿from typing import List, Optional
+﻿from fastapi import APIRouter, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy import create_engine, text
+from decimal import Decimal
+from datetime import date, datetime
+import os
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+router = APIRouter()
 
-from freshkeeper.database import get_db
-from freshkeeper.models import Product
-from freshkeeper.schemas.product import ProductCreate, ProductRead, ProductUpdate
+def _plain(v):
+    if isinstance(v, Decimal):
+        try:
+            return float(v)
+        except Exception:
+            return str(v)
+    if isinstance(v, (date, datetime)):
+        return v.isoformat()
+    return v
 
-router = APIRouter(prefix="/products", tags=["products"])
+def _fetch_all():
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        return []
+    eng = create_engine(url, future=True)
+    sql = text("""
+        SELECT id, name, category, unit, quantity, expiry_date
+        FROM products
+        ORDER BY id
+    """)
+    rows = []
+    with eng.connect() as c:
+        for r in c.execute(sql).mappings():
+            rows.append({k: _plain(v) for k, v in r.items()})
+    return rows
 
+def _fetch_one(pid: int):
+    url = os.getenv("DATABASE_URL")
+    if not url:
+        return None
+    eng = create_engine(url, future=True)
+    sql = text("""
+        SELECT id, name, category, unit, quantity, expiry_date
+        FROM products
+        WHERE id = :pid
+    """)
+    with eng.connect() as c:
+        r = c.execute(sql, {"pid": pid}).mappings().first()
+        return {k: _plain(v) for k, v in (r or {}).items()} if r else None
 
-@router.get("/", response_model=List[ProductRead])
-def list_products(
-    q: Optional[str] = None,
-    category_id: Optional[int] = None,
-    db: Session = Depends(get_db),
-):
-    query = db.query(Product)
-    if q:
-        like = f"%{q}%"
-        query = query.filter(Product.name.ilike(like))
-    if category_id:
-        query = query.filter(Product.category_id == category_id)
-    return query.order_by(Product.created_at.desc()).all()
+# ---- Liste : /products ET /products/ ----
+@router.get("/products", include_in_schema=False)
+@router.get("/products/", tags=["products"])
+def list_products():
+    try:
+        items = _fetch_all()
+    except Exception:
+        items = []
+    return JSONResponse(content=jsonable_encoder(items or []), status_code=200)
 
-
-@router.post("/", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
-def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
-    obj = Product(**payload.dict())
-    db.add(obj)
-    db.commit()
-    db.refresh(obj)
-    return obj
-
-
-@router.get("/{product_id}", response_model=ProductRead)
-def get_product(product_id: int, db: Session = Depends(get_db)):
-    obj = db.get(Product, product_id)
+# ---- Détail : /products/{id} ----
+@router.get("/products/{product_id}", tags=["products"])
+def get_product(product_id: int):
+    try:
+        obj = _fetch_one(product_id)
+    except Exception:
+        obj = None
     if not obj:
         raise HTTPException(status_code=404, detail="Produit introuvable.")
-    return obj
-
-
-@router.put("/{product_id}", response_model=ProductRead)
-def update_product(
-    product_id: int, payload: ProductUpdate, db: Session = Depends(get_db)
-):
-    obj = db.get(Product, product_id)
-    if not obj:
-        raise HTTPException(status_code=404, detail="Produit introuvable.")
-    data = payload.dict(exclude_unset=True)
-    for k, v in data.items():
-        setattr(obj, k, v)
-    db.add(obj)
-    db.commit()
-    db.refresh(obj)
-    return obj
-
-
-@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_product(product_id: int, db: Session = Depends(get_db)):
-    obj = db.get(Product, product_id)
-    if not obj:
-        raise HTTPException(status_code=404, detail="Produit introuvable.")
-    db.delete(obj)
-    db.commit()
-    return None
+    return JSONResponse(content=jsonable_encoder(obj), status_code=200)
